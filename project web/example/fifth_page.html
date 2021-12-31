@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html>
+<?php session_start(); ?>
+<head>
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+form {border: 3px solid #f1f1f1;}
+
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: blue;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.cancelbtn {
+  width: auto;
+  padding: 10px 18px;
+  background-color: #f44336;
+}
+
+.imgcontainer {
+  text-align: center;
+  margin: 24px 0 12px 0;
+}
+
+.container {
+  padding: 16px;
+}
+
+span.psw {
+  float: right;
+  padding-top: 16px;
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+  span.psw {
+     display: block;
+     float: none;
+  }
+  .cancelbtn {
+     width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<h2>Login Form</h2>
+
+<form name="first_form" >
+
+  <div class="container">
+    <label for="uname"><b>Username</b></label>
+    <input type="text" placeholder="Enter Username" name="uname">
+
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="psw">
+	
+	<?php 
+	$username = $POST['username'];
+	$password = $POST['password'];
+	
+	$username = stripcslashes($username);
+	$password = stripcslashes($password);
+	
+	$username = mysql_real_escape_string($username);
+	$password = mysql_real_escape_string($password);
+	
+	mysql_connect("localhost","root","");
+	mysql_select_db("login");
+	
+	$result = mysql_query("select*from users where username = '$username' and password = '$password'") or die ("Failed to query database".mysql_error());
+	$row = mysql_fetch_array($result);
+	if ($row['username']==$username)&& $row['password']==$password)
+	{
+	echo "login success !!! welcome".$row['username'];
+	}else{
+	echo"failed to login";
+	
+	}
+	
+	?>
+        
+    <button type="button" onclick="checkForm(first_form)">Login</button>
+  </div>
+
+  <div class="container" style="background-color:#f1f1f1">
+    <button type="button" class="cancelbtn">Cancel</button>
+  </div>
+</form>
+<script>
+function checkForm(form)
+  {
+	  var f = 0;
+    if(form.uname.value == "") {
+      alert("Error: Username cannot be blank!");
+      form.uname.focus();
+      return false;
+    }
+    re = /^\w+$/;
+    if(!re.test(form.uname.value)) {
+      alert("Error: Username must contain only letters, numbers and underscores!");
+      form.uname.focus();
+      return false;
+    }
+
+    if(form.psw.value != "") {
+      if(form.psw.value.length < 6) {
+        alert("Error: Password must contain at least six characters!");
+        form.psw.focus();
+        return false;
+      }
+      if(form.psw.value == form.uname.value) {
+        alert("Error: Password must be different from Username!");
+        form.psw.focus();
+        return false;
+      }
+      re = /[0-9]/;
+      if(!re.test(form.psw.value)) {
+        alert("Error: password must contain at least one number (0-9)!");
+        form.psw.focus();
+        return false;
+      }
+      re = /[a-z]/;
+      if(!re.test(form.psw.value)) {
+        alert("Error: password must contain at least one lowercase letter (a-z)!");
+        form.psw.focus();
+        return false;
+      }
+      re = /[A-Z]/;
+      if(!re.test(form.psw.value)) {
+        alert("Error: password must contain at least one uppercase letter (A-Z)!");
+        form.psw.focus();
+        return false;
+      }
+    } else {
+      alert("Error: Please check that you've entered and confirmed your password!");
+      form.psw.focus();
+      return false;
+    }
+	f = 1;
+    //alert("You entered a valid password: " + form.psw.value);
+	if ( f == 1)
+	{
+	var i;
+	var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+      //myFunction(this);
+  var xmlDoc = xhttp.responseXML;
+  var x = xmlDoc.getElementsByTagName("Login");
+  for (i = 0; i <x.length; i++) { 
+    if( form.uname.value === x[i].getElementsByTagName("Username")[0].childNodes[0].nodeValue && form.psw.value === x[i].getElementsByTagName("Password")[0].childNodes[0].nodeValue)
+	{
+	alert("Welcome " + form.uname.value);
+window.location.assign("cookies.php")
+	window.location.assign("sessions.php")
+		//window.location.assign("cookies.php")
+	}
+	else
+	{
+	alert("Check your Username or Password are incorrect");
+	}
+  }
+    }
+  };
+  xhttp.open("POST", "Users.xml", true);
+  xhttp.send();
+	}
+    return true;
+  }
+  </script>
+</body>
+</html>
